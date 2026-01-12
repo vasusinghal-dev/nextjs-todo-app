@@ -1,8 +1,8 @@
 import { Pool, PoolClient, QueryResult, QueryResultRow } from "pg";
 
 const createPool = () => {
-  if (!process.env.POSTGRES_URL) {
-    throw new Error("POSTGRES_URL is not defined");
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not defined");
   }
 
   return new Pool({
