@@ -6,6 +6,30 @@ This project focuses on **backend correctness and real-world auth patterns** rat
 
 ---
 
+## 📸 Preview
+
+### Welcome
+
+![Welcome Page](screenshots/welcome_page.png)
+
+### SignUp
+
+![SignUp Page](screenshots/signup_page.png)
+
+### Login
+
+![Login Page](screenshots/login_page.png)
+
+### Dashboard
+
+![Todo Dashboard](screenshots/dashboard_page.png)
+
+### Admin
+
+![Todo Admin](screenshots/admin_page.png)
+
+---
+
 ## 🚀 Features
 
 - User authentication (signup / login / logout)
