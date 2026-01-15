@@ -1,8 +1,8 @@
 # Auth-Based Todo App
 
-A production-ready **Todo application** built with **Next.js**, **PostgreSQL**, and **session-based authentication**.
+A production-ready **Todo application** built with **Next.js**, **PostgreSQL**, and **session-based authentication**, using **Prisma ORM** for safe and maintainable database access.
 
-This project focuses on **backend correctness and real-world auth patterns** rather than tutorial shortcuts.
+This project focuses on **backend correctness, schema discipline, and real-world auth patterns** — not tutorial shortcuts.
 
 ---
 
@@ -33,13 +33,14 @@ This project focuses on **backend correctness and real-world auth patterns** rat
 ## 🚀 Features
 
 - User authentication (signup / login / logout)
-- **Session-based auth** (server-side, no JWT)
+- **Session-based authentication** (server-side, no JWT)
 - Secure cookies (`httpOnly`, `secure`, `sameSite=lax`)
 - Role-ready user model (`user`, `admin`)
 - Create, complete, and soft-delete todos
-- PostgreSQL with proper constraints & indexes
-- Transaction-safe DB operations
-- Production-ready setup for Vercel + Neon
+- PostgreSQL with **proper constraints & indexes**
+- **Atomic DB operations** (transactions & raw SQL where needed)
+- Prisma ORM with explicit Postgres adapter (Prisma 7)
+- Production-ready setup for **Vercel + Neon**
 
 ---
 
@@ -55,8 +56,9 @@ This project focuses on **backend correctness and real-world auth patterns** rat
 ### Backend
 
 - Next.js Route Handlers / Server Actions
+- **Prisma ORM (v7)**
 - PostgreSQL
-- `pg` (node-postgres)
+- `@prisma/adapter-pg` (explicit DB adapter)
 - `bcryptjs` (password hashing)
 - `zod` (input validation)
 
@@ -69,7 +71,9 @@ This project focuses on **backend correctness and real-world auth patterns** rat
 
 ## 🗄 Database Schema
 
-### Users
+Managed via **Prisma schema + migrations**, mapped cleanly to PostgreSQL tables.
+
+### user
 
 - `id` (serial, primary key)
 - `email` (unique)
@@ -78,14 +82,14 @@ This project focuses on **backend correctness and real-world auth patterns** rat
 - `role` (`user` | `admin`)
 - `created_at`, `updated_at`
 
-### Sessions
+### session
 
 - `id` (session token)
 - `user_id` (FK → users)
 - `expires_at`
 - `created_at`
 
-### Todos
+### todo
 
 - `id`
 - `title`
@@ -94,7 +98,7 @@ This project focuses on **backend correctness and real-world auth patterns** rat
 - `user_id` (FK → users)
 - `created_at`
 
-Indexes are added on frequently queried columns (`email`, `user_id`, active todos, sessions).
+Indexes are added on frequently queried columns (`email`, `user_id`, `deleted_at`, session expiration).
 
 ---
 
@@ -106,7 +110,19 @@ Indexes are added on frequently queried columns (`email`, `user_id`, active todo
 - All protected routes validate the session **server-side**
 - Logout deletes both the cookie and the DB session
 
-This avoids common JWT pitfalls and mirrors how real production apps handle auth.
+This mirrors **real production auth systems** and avoids common JWT pitfalls.
+
+---
+
+## 🧠 Database Access Strategy
+
+- Prisma is used for **most queries** (type-safe, maintainable)
+- **Raw SQL is used selectively** for:
+
+  - atomic updates (e.g. toggling todo state)
+  - operations Prisma cannot express safely in one query
+
+- This hybrid approach balances **correctness, performance, and clarity**
 
 ---
 
@@ -115,9 +131,10 @@ This avoids common JWT pitfalls and mirrors how real production apps handle auth
 This project was built to:
 
 - Practice **real authentication patterns**
-- Avoid tutorial-only abstractions
+- Learn **Prisma migrations on an existing database**
 - Understand PostgreSQL constraints, indexes, and sessions
-- Build something that reflects **industry-grade fundamentals**
+- Avoid ORM magic and know when to drop to SQL
+- Build something that reflects **industry-grade backend fundamentals**
 
 ---
 
@@ -133,4 +150,5 @@ Built by **Vasu Singhal**
 
 ---
 
-If you’re reviewing this repo: focus on the **auth flow, DB design, and server-side logic** — that’s where the real work is.
+> If you’re reviewing this repo:
+> focus on the **auth flow, Prisma schema, migrations, and server-side logic** — that’s where the real work lives.

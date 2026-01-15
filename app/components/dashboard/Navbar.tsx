@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { user } from "@/types";
+import { User } from "@/types";
 
 interface NavbarProps {
-  user: user;
+  user: User;
 }
 
 export default function Navbar({ user }: NavbarProps) {

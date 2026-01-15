@@ -1,5 +1,6 @@
 import { createSession } from "@/lib/auth/auth";
-import { query } from "@/lib/db";
+// import { query } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -23,15 +24,19 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, email, password } = signupSchema.parse(body);
 
-    const existingUser = await query(
-      `
-    SELECT id FROM users
-    WHERE email = $1
-    `,
-      [email]
-    );
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
 
-    if (existingUser.rows.length > 0) {
+    // const existingUser = await query(
+    //   `
+    // SELECT id FROM users
+    // WHERE email = $1
+    // `,
+    //   [email]
+    // );
+
+    if (existingUser) {
       return NextResponse.json(
         { error: "User already exists" },
         { status: 409 }
@@ -40,17 +45,28 @@ export async function POST(request: NextRequest) {
 
     const password_hash = await bcrypt.hash(password, 10);
 
-    const result = await query(
-      `
-    INSERT INTO users (name, email, password_hash)
-    VALUES ($1, $2, $3)
-    RETURNING id
-    `,
-      [name, email, password_hash]
-    );
-    const userId = result.rows[0].id;
+    const user = await prisma.user.create({
+      data: {
+        name: name,
+        email: email,
+        password_hash: password_hash,
+      },
+      select: {
+        id: true,
+      },
+    });
 
-    await createSession(userId);
+    // const result = await query(
+    //   `
+    // INSERT INTO users (name, email, password_hash)
+    // VALUES ($1, $2, $3)
+    // RETURNING id
+    // `,
+    //   [name, email, password_hash]
+    // );
+    // const userId = result.rows[0].id;
+
+    await createSession(user.id);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model user {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique @db.VarChar(255)
+  password_hash String    @db.VarChar(255)
+  name          String    @db.VarChar(100)
+  role          UserRole  @default(user)
+  created_at    DateTime  @default(now()) @db.Timestamptz
+  updated_at    DateTime  @default(now()) @updatedAt @db.Timestamptz
+  
+  sessions session[]
+  todos    todo[]
+  
+  @@index([email], name: "idx_users_email")
+}
+
+model todo {
+  id           Int      @id @default(autoincrement())
+  title        String   @db.VarChar(255)
+  is_completed Boolean  @default(false)
+  deleted_at   DateTime? @db.Timestamptz
+  created_at   DateTime @default(now()) @db.Timestamptz
+  user_id      Int
+  
+  user user @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id], name: "idx_todos_user_id")
+  @@index([deleted_at], name: "idx_todos_not_deleted")
+}
+
+model session {
+  id         String @id @db.VarChar(64)
+  user_id    Int
+  expires_at DateTime @db.Timestamptz
+  created_at DateTime @default(now()) @db.Timestamptz
+  
+  user user @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id], name: "idx_sessions_user_id")
+  @@index([id, expires_at], name: "idx_sessions_id_expires_at")
+}
+
+enum UserRole {
+  user
+  admin
+}

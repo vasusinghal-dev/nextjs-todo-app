@@ -1,5 +1,6 @@
 import { createSession } from "@/lib/auth/auth";
-import { query } from "@/lib/db";
+// import { query } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -14,19 +15,29 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password } = loginSchema.parse(body);
 
-    const result = await query<{
-      id: number;
-      password_hash: string;
-    }>(
-      `
-      SELECT id, password_hash
-      FROM users
-      WHERE email = $1
-      `,
-      [email]
-    );
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: {
+        id: true,
+        password_hash: true,
+      },
+    });
 
-    const user = result.rows[0];
+    // const result = await query<{
+    //   id: number;
+    //   password_hash: string;
+    // }>(
+    //   `
+    //   SELECT id, password_hash
+    //   FROM users
+    //   WHERE email = $1
+    //   `,
+    //   [email]
+    // );
+
+    // const user = result.rows[0];
 
     if (!user) {
       return NextResponse.json(

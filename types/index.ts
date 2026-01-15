@@ -1,15 +1,13 @@
-export type UserRole = "user" | "admin";
+import type {
+  Todo as PrismaTodo,
+  User as PrismaUser,
+  UserRole as PrismaUserRole,
+} from "@prisma/client";
 
-export type user = {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  created_at: Date;
-};
-
-export type Todo = {
-  title: string;
-  id: number;
-  is_completed: boolean;
-};
+// Your custom types
+export type Todo = Pick<PrismaTodo, "id" | "title" | "is_completed">;
+export type User = Pick<
+  PrismaUser,
+  "id" | "name" | "email" | "role" | "created_at"
+>;
+export type UserRole = PrismaUserRole;
