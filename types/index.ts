@@ -1,6 +1,6 @@
 import type {
-  Todo as PrismaTodo,
-  User as PrismaUser,
+  todo as PrismaTodo,
+  user as PrismaUser,
   UserRole as PrismaUserRole,
 } from "@prisma/client";
 
