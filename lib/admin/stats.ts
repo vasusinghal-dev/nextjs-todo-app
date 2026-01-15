@@ -6,11 +6,20 @@ export async function getAdminStatsData() {
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
 
+  const activeUsersPromise = prisma.todo.findMany({
+    where: {
+      created_at: { gte: todayStart },
+      deleted_at: null,
+    },
+    distinct: ["user_id"],
+    select: { user_id: true },
+  });
+
   const [
     totalUsers,
     totalTodos,
     completedTodos,
-    activeUsersToday,
+    activeUsers,
     newUsersYesterday,
     newTodosYesterday,
   ] = await Promise.all([
@@ -26,20 +35,7 @@ export async function getAdminStatsData() {
         deleted_at: null,
       },
     }),
-    prisma.todo
-      .findMany({
-        where: {
-          created_at: {
-            gte: todayStart,
-          },
-          deleted_at: null,
-        },
-        distinct: ["user_id"],
-        select: {
-          user_id: true,
-        },
-      })
-      .then((result) => result.length),
+    activeUsersPromise,
     prisma.user.count({
       where: {
         created_at: {
@@ -56,6 +52,8 @@ export async function getAdminStatsData() {
       },
     }),
   ]);
+
+  const activeUsersToday = activeUsers.length;
 
   // const [
   //   usersResult,
