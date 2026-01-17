@@ -1,45 +1,9 @@
-"use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthForm from "@/app/components/auth/AuthForm";
+import { SocialButtons } from "@/app/components/auth/SocialButtons";
+import { signupAction } from "@/app/actions/auth";
 
 export default function SignupPage() {
-  const router = useRouter();
-  const [error, setError] = useState<string>("");
-
-  const handleSubmit = async (formData: FormData) => {
-    setError("");
-
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          typeof data.error === "string"
-            ? data.error
-            : "Signup failed. Please try again."
-        );
-      }
-
-      // Redirect to dashboard on success
-      router.push("/dashboard");
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -58,7 +22,22 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <AuthForm type="signup" onSubmit={handleSubmit} error={error} />
+        {/* Social Login Buttons */}
+        <SocialButtons />
+
+        {/* Divider */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-gray-50 text-gray-500">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
+        <AuthForm type="signup" action={signupAction} />
       </div>
     </div>
   );

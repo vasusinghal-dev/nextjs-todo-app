@@ -1,9 +1,11 @@
 "use client";
 import { Todo } from "@/types";
-import { createTodoAction } from "../../actions/todos/create";
 import { AddTodoButton } from "./AddTodoButton";
-import { toggleTodoAction } from "../../actions/todos/update";
-import { deleteTodoAction } from "../../actions/todos/delete";
+import {
+  createTodoAction,
+  deleteTodoAction,
+  toggleTodoAction,
+} from "@/app/actions/todos";
 
 export default function Todos({ initialTodos }: { initialTodos: Todo[] }) {
   return (

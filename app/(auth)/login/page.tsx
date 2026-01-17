@@ -1,39 +1,26 @@
-"use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthForm from "@/app/components/auth/AuthForm";
+import { SocialButtons } from "@/app/components/auth/SocialButtons";
+import { loginAction } from "@/app/actions/auth";
 
-export default function LoginPage() {
-  const router = useRouter();
-  const [error, setError] = useState<string>("");
+const AUTH_ERRORS = {
+  oauth_failed: "Failed to connect. Please try again.",
+  oauth_cancelled: "Login was cancelled.",
+} as const;
 
-  const handleSubmit = async (formData: FormData) => {
-    setError("");
+function isAuthError(value: string): value is keyof typeof AUTH_ERRORS {
+  return value in AUTH_ERRORS;
+}
 
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const sp = await searchParams;
 
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
-      }
-
-      // Redirect to dashboard on success
-      router.push("/dashboard");
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    }
-  };
+  const errorMessage =
+    sp.error && isAuthError(sp.error) ? AUTH_ERRORS[sp.error] : undefined;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -53,7 +40,22 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <AuthForm type="login" onSubmit={handleSubmit} error={error} />
+        {/* Social Login Buttons */}
+        <SocialButtons error={errorMessage} />
+
+        {/* Divider */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-gray-50 text-gray-500">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
+        <AuthForm type="login" action={loginAction} />
       </div>
     </div>
   );

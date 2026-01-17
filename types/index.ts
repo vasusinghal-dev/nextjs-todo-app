@@ -1,8 +1,5 @@
-import type {
-  todo as PrismaTodo,
-  user as PrismaUser,
-  UserRole as PrismaUserRole,
-} from "@prisma/client";
+export { UserRole, OAuthProvider } from "@prisma/client";
+import { todo as PrismaTodo, user as PrismaUser } from "@prisma/client";
 
 // Your custom types
 export type Todo = Pick<PrismaTodo, "id" | "title" | "is_completed">;
@@ -10,4 +7,3 @@ export type User = Pick<
   PrismaUser,
   "id" | "name" | "email" | "role" | "created_at"
 >;
-export type UserRole = PrismaUserRole;

@@ -8,17 +8,37 @@ datasource db {
 
 model user {
   id            Int       @id @default(autoincrement())
-  email         String    @unique @db.VarChar(255)
-  password_hash String    @db.VarChar(255)
+  email         String?   @unique @db.VarChar(255) 
+  password_hash String?   @db.VarChar(255)
   name          String    @db.VarChar(100)
   role          UserRole  @default(user)
+  avatar_url    String?   @db.VarChar(500)
   created_at    DateTime  @default(now()) @db.Timestamptz
   updated_at    DateTime  @default(now()) @updatedAt @db.Timestamptz
-  
-  sessions session[]
-  todos    todo[]
+ 
+  sessions    session[]
+  todos       todo[]
+  oauth_accounts oauth_account[]
   
   @@index([email], name: "idx_users_email")
+}
+
+model oauth_account {
+  id             Int           @id @default(autoincrement())
+  provider       OAuthProvider
+  provider_user_id String      @db.VarChar(255)
+  user_id        Int
+  access_token   String?       @db.VarChar(1024)
+  refresh_token  String?       @db.VarChar(1024)
+  expires_at     DateTime?     @db.Timestamptz
+  scope          String?       @db.VarChar(255)
+  created_at     DateTime      @default(now()) @db.Timestamptz
+  updated_at     DateTime      @default(now()) @updatedAt @db.Timestamptz
+  
+  user user @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@unique([provider, provider_user_id])
+  @@index([user_id], name: "idx_oauth_accounts_user_id")
 }
 
 model todo {
@@ -50,4 +70,9 @@ model session {
 enum UserRole {
   user
   admin
+}
+
+enum OAuthProvider {
+  github
+  google
 }

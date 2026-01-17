@@ -29,7 +29,7 @@ export const createSession = async (userId: number) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    expires,
+    maxAge: 7 * 24 * 60 * 60,
     path: "/",
   });
 };

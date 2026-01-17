@@ -20,7 +20,7 @@ export const getPool = (): Pool => {
     pool = createPool();
 
     pool.on("error", (err) =>
-      console.log("Unexpected error on idle client", err)
+      console.error("Unexpected error on idle client", err),
     );
   }
 
@@ -29,7 +29,7 @@ export const getPool = (): Pool => {
 
 export const query = <T extends QueryResultRow = any>(
   text: string,
-  params: any[] = []
+  params: any[] = [],
 ): Promise<QueryResult<T>> => {
   const pool = getPool();
   return pool.query<T>(text, params);
@@ -42,7 +42,7 @@ const getClient = async (): Promise<PoolClient> => {
 
 // Higher-order function for transactions
 export const withTransaction = async <T>(
-  fn: (client: PoolClient) => Promise<T>
+  fn: (client: PoolClient) => Promise<T>,
 ): Promise<T> => {
   const client = await getClient();
 
